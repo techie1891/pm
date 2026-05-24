@@ -1,8 +1,7 @@
 "use client";
 
-import { useAuth } from "@/lib/auth";
 import dynamicImport from "next/dynamic";
-import { AuthProvider } from "@/lib/auth";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import { useEffect, useState } from "react";
 
 // Dynamically load heavy components without SSR.
@@ -30,7 +29,8 @@ const ProtectedBoard = dynamicImport(
   },
 );
 
-export default function AuthWrapper() {
+// Separate component that consumes the auth context.
+function AuthContent() {
   const { isAuthenticated } = useAuth();
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -46,9 +46,14 @@ export default function AuthWrapper() {
     );
   }
 
+  return isAuthenticated ? <ProtectedBoard /> : <LoginPage />;
+}
+
+export default function AuthWrapper() {
+  // Wrap the auth context around the content component.
   return (
     <AuthProvider>
-      {isAuthenticated ? <ProtectedBoard /> : <LoginPage />}
+      <AuthContent />
     </AuthProvider>
   );
 }

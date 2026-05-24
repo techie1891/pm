@@ -1,11 +1,10 @@
-// Server component – force dynamic rendering to avoid prerendering.
+// Prevent Next.js from prerendering this page during build.
 export const dynamic = "force-dynamic";
-// Disable ISR/static generation for this page.
-export const revalidate = false;
 
+// Import the client wrapper directly; it's a client component so it will be
+// rendered on the client and not execute server‑side hooks during prerender.
 import AuthWrapper from "./AuthWrapper";
 
 export default function Home() {
-  // Delegate auth handling to a client‑side wrapper.
   return <AuthWrapper />;
 }
