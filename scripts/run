@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT_DIR"
+case "$1" in
+  start)
+    docker compose up --build -d
+    ;;
+  stop)
+    docker compose down
+    ;;
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+esac

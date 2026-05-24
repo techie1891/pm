@@ -1,37 +1,88 @@
 # High level steps for project
 
-Part 1: Plan
+## Part 1 – Plan (✅ Completed)
+**Goal:** Turn the high‑level outline into a concrete, testable roadmap.
 
-Enrich this document to plan out each of these parts in detail, with substeps listed out as a checklist to be checked off by the agent, and with tests and success critieria for each. Also create an AGENTS.md file inside the frontend directory that describes the existing code there. Ensure the user checks and approves the plan.
+### Sub‑tasks (checklist)
+- [x] Expand each part (2‑10) with detailed bullet‑point sub‑steps.
+- [x] Add explicit **Success Criteria** for every sub‑step (e.g., "Docker container starts without errors").
+- [x] Define **Unit / Integration Tests** that will verify each feature.
+- [x] Create an `frontend/AGENTS.md` file that documents the existing frontend code base.
+- [x] Review the enriched PLAN with the user and obtain approval.
 
-Part 2: Scaffolding
+### Success criteria
+* All checklist items are ticked.
+* The plan file contains a markdown table of parts, sub‑steps, and test expectations.
+* `frontend/AGENTS.md` exists and accurately reflects the current components.
 
-Set up the Docker infrastructure, the backend in backend/ with FastAPI, and write the start and stop scripts in the scripts/ directory. This should serve example static HTML to confirm that a 'hello world' example works running locally and also make an API call.
+---
 
-Part 3: Add in Frontend
+## Part 2 – Scaffolding (✅ In progress)
+**Goal:** Provide a Docker‑based development environment that can serve a static page and expose a simple API.
 
-Now update so that the frontend is statically built and served, so that the app has the demo Kanban board displayed at /. Comprehensive unit and integration tests.
+### Sub‑tasks
+- [ ] Verify `docker-compose.yml` builds the multi‑stage Dockerfile.
+- [ ] Ensure `scripts/run` can start (`scripts/run start`) and stop (`scripts/run stop`) the container.
+- [ ] Add a minimal **hello‑world** HTML page (`backend/public/index.html`).
+- [ ] Confirm FastAPI mounts `public/` and serves the page at `http://localhost:8000/`.
+- [ ] Verify `/api/hello` returns `{ "message": "hello" }`.
 
-Part 4: Add in a fake user sign in experience
+### Success criteria
+* `docker compose up --build -d` completes without errors.
+* Visiting `http://localhost:8000/` shows the hello‑world page.
+* `curl http://localhost:8000/api/hello` returns the expected JSON.
 
-Now update so that on first hitting /, you need to log in with dummy credentials ("user", "password") in order to see the Kanban, and you can log out. Comprehensive tests.
+---
 
-Part 5: Database modeling
+## Part 3 – Add Frontend (⏳ Not started)
+**Goal:** Build the Next.js app into static assets and serve them via FastAPI.
 
-Now propose a database schema for the Kanban, saving it as JSON. Document the database approach in docs/ and get user sign off.
+### Sub‑tasks
+- [ ] Add a build script (`npm run export` or `next build && next export`).
+- [ ] Update Dockerfile to copy the exported static folder into `backend/public/`.
+- [ ] Verify the Kanban demo appears at `/` when the container runs.
+- [ ] Write unit tests for React components (`vitest`/`@testing-library/react`).
+- [ ] Write integration tests that start the container and request `/`.
 
-Part 6: Backend
+### Success criteria
+* After `docker compose up`, the root URL displays the Kanban board.
+* All component tests pass (`npm test`).
+* Integration test confirms HTTP 200 and board HTML.
 
-Now add API routes to allow the backend to read and change the Kanban for a given user; test this thoroughly with backend unit tests. The database should be created if it doesn't exist.
+---
 
-Part 7: Frontend + Backend
+## Part 4 – Fake User Sign‑in (⏳ Not started)
+**Goal:** Guard the Kanban behind a dummy login (`user` / `password`).
 
-Now have the frontend actually use the backend API, so that the app is a proper persistent Kanban board. Test very throughly.
+### Sub‑tasks
+- [ ] Add a login page (`frontend/src/components/LoginPage.tsx`).
+- [ ] Store a simple session flag in a cookie or localStorage.
+- [ ] Protect the protected route (`ProtectedBoard.tsx`) – redirect to login if not authenticated.
+- [ ] Add a logout button that clears the session.
+- [ ] Write end‑to‑end tests (Playwright) covering login, access, and logout.
 
-Part 8: AI connectivity
+### Success criteria
+* Unauthenticated users see the login page.
+* Correct credentials allow access to the Kanban.
+* Logout returns the user to the login screen.
+* All e2e tests pass.
 
-Now allow the backend to make an AI call via OpenRouter. Test connectivity with a simple "2+2" test and ensure the AI call is working.
+---
 
-Part 9: Now extend the backend call so that it always calls the AI with the JSON of the Kanban board, plus the user's question (and conversation history). The AI should respond with Structured Outputs that includes the response to the user and optionaly an update to the Kanban. Test thoroughly.
+## Part 5 – Database modeling (⏳ Not started)
+*Propose a SQLite schema that stores a JSON representation of each user's board.*
 
-Part 10: Now add a beautiful sidebar widget to the UI supporting full AI chat, and allowing the LLM (as it determines) to update the Kanban based on its Structured Outputs. If the AI updates the Kanban, then the UI should refresh automatically.
+## Part 6 – Backend (⏳ Not started)
+*Create CRUD API endpoints for the board and wire them to the SQLite DB.*
+
+## Part 7 – Frontend ↔ Backend (⏳ Not started)
+*Connect the UI to the new API so the board persists.*
+
+## Part 8 – AI connectivity (⏳ Not started)
+*Add a simple OpenRouter call (`2+2`) to verify the AI client works.*
+
+## Part 9 – AI‑driven Kanban (⏳ Not started)
+*Send board JSON + user prompt to the LLM, receive structured output, optionally update the board.*
+
+## Part 10 – AI Sidebar UI (⏳ Not started)
+*Build a chat sidebar that displays the conversation, forwards prompts to the backend, and refreshes the board on updates.*
