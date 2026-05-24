@@ -70,7 +70,28 @@
 ---
 
 ## Part 5 – Database modeling (⏳ Not started)
-*Propose a SQLite schema that stores a JSON representation of each user's board.*
+## Part 5 – Database modeling (In progress)
+**Goal:** Persist each user's Kanban board in a lightweight SQLite database as JSON, expose simple CRUD API endpoints, and create migration/initialisation that runs automatically when the backend starts.
+
+### Schema proposal
+- Table: `boards`
+	- `username` TEXT PRIMARY KEY — unique user identifier (for MVP a single hardcoded user will be used)
+	- `board_json` TEXT NOT NULL — the Kanban board stored as a JSON string
+	- `updated_at` TEXT NOT NULL — ISO timestamp of last update
+
+### Sub‑tasks
+- [x] Define schema and rationale (this file).
+- [x] Add `docs/db_schema.md` with details and examples.
+- [x] Implement DB initialisation on backend startup (`backend/main.py`).
+- [x] Add endpoints: `GET /api/board/{username}` and `POST /api/board/{username}`.
+- [ ] Add backend unit tests to verify DB CRUD behavior.
+- [ ] Add migration or seed data if required.
+
+### Success criteria
+* Backend creates `backend/kanban.db` if missing and the `boards` table exists. 
+* `GET /api/board/user` returns either persisted board JSON or a default empty board structure.
+* `POST /api/board/user` stores the provided board JSON and returns an updated timestamp.
+
 
 ## Part 6 – Backend (⏳ Not started)
 *Create CRUD API endpoints for the board and wire them to the SQLite DB.*

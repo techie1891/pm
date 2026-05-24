@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -14,10 +14,13 @@ import {
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
 import { createId, initialData, moveCard, type BoardData } from "@/lib/kanban";
+import { fetchBoard, saveBoard } from "@/lib/api";
 
 export const KanbanBoard = () => {
   const [board, setBoard] = useState<BoardData>(() => initialData);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const saveTimeout = useRef<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -91,6 +94,40 @@ export const KanbanBoard = () => {
 
   const activeCard = activeCardId ? cardsById[activeCardId] : null;
 
+  // Load board from backend on mount
+  useEffect(() => {
+    let mounted = true;
+    fetchBoard("user")
+      .then((b) => {
+        if (mounted && b) setBoard(b);
+      })
+      .catch((err) => {
+        console.error("fetchBoard failed:", err);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Debounced save on board changes
+  useEffect(() => {
+    if (saveTimeout.current) {
+      window.clearTimeout(saveTimeout.current);
+    }
+    // debounce 1s
+    saveTimeout.current = window.setTimeout(() => {
+      setIsSaving(true);
+      saveBoard("user", board)
+        .catch((err) => {
+          console.error("saveBoard failed:", err);
+        })
+        .finally(() => setIsSaving(false));
+    }, 1000);
+    return () => {
+      if (saveTimeout.current) window.clearTimeout(saveTimeout.current);
+    };
+  }, [board]);
+
   return (
     <div className="relative overflow-hidden">
       <div className="pointer-events-none absolute left-0 top-0 h-[420px] w-[420px] -translate-x-1/3 -translate-y-1/3 rounded-full bg-[radial-gradient(circle,_rgba(32,157,215,0.25)_0%,_rgba(32,157,215,0.05)_55%,_transparent_70%)]" />
@@ -117,6 +154,9 @@ export const KanbanBoard = () => {
               </p>
               <p className="mt-2 text-lg font-semibold text-[var(--primary-blue)]">
                 One board. Five columns. Zero clutter.
+              </p>
+              <p className="mt-2 text-sm text-[var(--gray-text)]">
+                {isSaving ? "Saving..." : "All changes saved"}
               </p>
             </div>
           </div>
