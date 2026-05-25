@@ -57,3 +57,36 @@ export const fetchBoard = API.fetchBoard;
 export const saveBoard = API.saveBoard;
 
 export const _normalizeServerBoard = normalizeServerBoard;
+
+// Granular endpoints
+export const createCard = async (
+  username: string,
+  columnId: string,
+  card: { title: string; details?: string }
+) => {
+  const res = await fetch(`/api/board/${encodeURIComponent(username)}/cards`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ column_id: columnId, card }),
+  });
+  if (!res.ok) throw new Error("Failed to create card");
+  return res.json();
+};
+
+export const deleteCard = async (username: string, cardId: string) => {
+  const res = await fetch(`/api/board/${encodeURIComponent(username)}/cards/${cardId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete card");
+  return res.json();
+};
+
+export const updateColumn = async (username: string, columnId: string, title: string) => {
+  const res = await fetch(`/api/board/${encodeURIComponent(username)}/columns/${columnId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  });
+  if (!res.ok) throw new Error("Failed to update column");
+  return res.json();
+};

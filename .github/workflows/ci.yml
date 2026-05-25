@@ -41,6 +41,9 @@ jobs:
         run: |
           npm ci
           npm run build
-      - name: Run frontend tests (if configured)
+      - name: Install Playwright browsers
         working-directory: frontend
-        run: npm test --if-present
+        run: npx playwright install --with-deps
+      - name: Run Playwright E2E tests
+        working-directory: frontend
+        run: npx playwright test --reporter=list

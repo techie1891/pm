@@ -69,8 +69,7 @@
 
 ---
 
-## Part 5 – Database modeling (⏳ Not started)
-## Part 5 – Database modeling (In progress)
+## Part 5 – Database modeling (✅ Completed)
 **Goal:** Persist each user's Kanban board in a lightweight SQLite database as JSON, expose simple CRUD API endpoints, and create migration/initialisation that runs automatically when the backend starts.
 
 ### Schema proposal
@@ -84,26 +83,53 @@
 - [x] Add `docs/db_schema.md` with details and examples.
 - [x] Implement DB initialisation on backend startup (`backend/main.py`).
 - [x] Add endpoints: `GET /api/board/{username}` and `POST /api/board/{username}`.
-- [ ] Add backend unit tests to verify DB CRUD behavior.
-- [ ] Add migration or seed data if required.
+- [x] Add backend unit tests to verify DB CRUD behavior (`backend/test_db.py`, `backend/test_crud.py`).
+- [x] Add migration/seed logic (`migrate_board_shape()` in `backend/main.py`, `backend/seed.py`).
 
 ### Success criteria
-* Backend creates `backend/kanban.db` if missing and the `boards` table exists. 
-* `GET /api/board/user` returns either persisted board JSON or a default empty board structure.
-* `POST /api/board/user` stores the provided board JSON and returns an updated timestamp.
+- Backend creates `backend/kanban.db` if missing and the `boards` table exists (see `backend/main.py`).
+- `GET /api/board/user` returns persisted or default board JSON (`GET /api/board/{username}`).
+- `POST /api/board/user` stores the provided board JSON and returns an updated timestamp.
+
+Implemented files/endpoints for Part 5:
+- [backend/main.py](backend/main.py) — DB init, migrations, CRUD endpoints, granular card/column APIs, `apply-actions`.
+- [backend/test_db.py](backend/test_db.py) and [backend/test_crud.py](backend/test_crud.py) — unit tests (all passing).
+- [backend/seed.py](backend/seed.py) — optional seed data.
+
+Status: Completed and validated via `pytest` inside the running container (10 tests passed).
 
 
-## Part 6 – Backend (⏳ Not started)
+## Part 6 – Backend (✅ Completed)
 *Create CRUD API endpoints for the board and wire them to the SQLite DB.*
 
-## Part 7 – Frontend ↔ Backend (⏳ Not started)
+Implemented: full CRUD for cards and columns plus `apply-actions` in `backend/main.py`.
+
+See: [backend/main.py](backend/main.py)
+
+## Part 7 – Frontend ↔ Backend (✅ Completed)
 *Connect the UI to the new API so the board persists.*
 
-## Part 8 – AI connectivity (⏳ Not started)
-*Add a simple OpenRouter call (`2+2`) to verify the AI client works.*
+Implemented: API client and wiring in `frontend/src/lib/api.ts` and `frontend/src/components/KanbanBoard.tsx` with debounced saves and optimistic updates.
 
-## Part 9 – AI‑driven Kanban (⏳ Not started)
+See: [frontend/src/lib/api.ts](frontend/src/lib/api.ts) and [frontend/src/components/KanbanBoard.tsx](frontend/src/components/KanbanBoard.tsx)
+
+## Part 8 – AI connectivity (✅ Completed)
+*Add a simple OpenRouter call to verify the AI client works.*
+
+Implemented: `/api/ai/compute` in `backend/main.py` which proxies to OpenRouter when `OPENROUTER_API_KEY` is present, and otherwise provides a safe fallback evaluator/mock.
+
+See: [backend/main.py](backend/main.py)
+
+## Part 9 – AI‑driven Kanban (✅ Completed)
 *Send board JSON + user prompt to the LLM, receive structured output, optionally update the board.*
 
-## Part 10 – AI Sidebar UI (⏳ Not started)
+Implemented: `/api/ai/modify-board` which requests JSON instructions from OpenRouter (when configured) or returns a mock action that adds a card. Server endpoint and `apply-actions` allow programmatic updates.
+
+See: [backend/main.py](backend/main.py)
+
+## Part 10 – AI Sidebar UI (✅ Completed)
 *Build a chat sidebar that displays the conversation, forwards prompts to the backend, and refreshes the board on updates.*
+
+Implemented: `frontend/src/components/AISidebar.tsx` and UI toggle in `KanbanBoard.tsx`. The sidebar sends prompts to `/api/ai/modify-board`, applies suggested `actions` via `/api/board/{username}/apply-actions`, and refreshes the board.
+
+See: [frontend/src/components/AISidebar.tsx](frontend/src/components/AISidebar.tsx)
